@@ -1,2 +1,2 @@
 # UCMetrics-SLK
-Towards the development of UC/MC metrics
+Towards the development of UC/MC metrics for sustainable diversification
