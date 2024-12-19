@@ -1,41 +1,36 @@
+library(sf)
+library(raster)
 
 #list.of.packages <- c("raster","rgdal", "maptools","RMySQL","rjson","sp","dplyr","jsonlite", "RCurl", "tibble  ")
 #pckList <- lapply(list.of.packages, require, character.only = TRUE)
-f <- function (ngrid, ncrop) {
-    
-  
-  library(sf)
 
+f <- function (ngrid, ncrop) {
+  
+  # loading grid data
+  
   grid <- st_read("/Users/ej/CFFRC/04-Research/UC metrics/UCMetrics-SLK/in/grid/slk_gridlo543.shp")
   
-  #---------------------------------------------------
-  #               data load
-  #---------------------------------------------------
-  library(raster)
-  
-  # climate data
+  # loading climate data
   tempdata = stack()
+  raindata = stack()
   
-  ukmetpath = "/Users/ej/CFFRC/04-Research/UK crops/Analysis/in/ukmet/"
-  for (i in c("UKtasJan", "UKtasFeb", "UKtasMar", "UKtasApr", "UKtasMay", "UKtasJun", "UKtasJul",
-              "UKtasAug", "UKtasSep", "UKtasOct", "UKtasNov", "UKtasDec")) {
-    temprast = raster(paste(ukmetpath,i,".tif",sep=""));
-    crs(temprast) = "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0";
-    tempdata = addLayer(tempdata, temprast);
+  climpath ="/Users/ej/CFFRC/04-Research/UC metrics/UCMetrics-SLK/in/worldclim/" 
+  for (i in 1:12) {
+    tempdata <- addLayer(tempdata, paste0(climpath, "tmean",i ,"_28_slk.tif"))
+    raindata <- addLayer(raindata, paste0(climpath, "prec",i ,"_28_slk.tif"))
   }
-  names(tempdata) <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep",  "Oct", "Nov", "Dec")
   
-  # for soil
+  # loading soil
   phdata = stack()
   sandata = stack()
   claydata = stack()
   
-  phpath ="/Users/ej/CFFRC/04-Research/Soil/climatesoilindex/cmbndsuitindx/data/soil/"
-  otherpath = "/Users/ej/CFFRC/05-Projects/Bera/Activity 3/Tool/TTSR/soil/Soils/"
-  for (o in 1:7) phdata = addLayer(phdata, raster(paste(phpath,"PHIHOX_M_sl",  o, "_250m_ll.tif", sep = "")))
-  for (o in 1:7) claydata = addLayer(claydata, raster(paste(otherpath,"CLYPPT_M_sl",  o, "_250m_ll.tif", sep = "")))
-  for (o in 1:7) sandata = addLayer(sandata, raster(paste(otherpath,"SNDPPT_M_sl",  o, "_250m_ll.tif", sep = "")))
-  depthdata = raster(paste(phpath,"BDRICM_M_250m_ll.tif", sep = ""))
+  soilpath ="/Users/ej/CFFRC/04-Research/UC metrics/UCMetrics-SLK/in/soilgrids/"
+
+  for (o in 1:7) phdata = addLayer(phdata, raster(paste(soilpath,"PHIHOX_M_sl",  o, "_250m_ll_slk.tif", sep = "")))
+  for (o in 1:7) claydata = addLayer(claydata, raster(paste(soilpath,"CLYPPT_M_sl",  o, "_250m_ll_slk.tif", sep = "")))
+  for (o in 1:7) sandata = addLayer(sandata, raster(paste(soilpath,"SNDPPT_M_sl",  o, "_250m_ll_slk.tif", sep = "")))
+  depthdata = raster(paste(soilpath,"BDRICM_M_250m_ll_slk.tif", sep = ""))
   
   # data from DB
   ecology <- read.csv("./in/ecology/ecology Jul20.csv")
@@ -106,6 +101,7 @@ f <- function (ngrid, ncrop) {
     # extract climate data
     utemp <- as.numeric(data.frame(extract(tempdata, sp)))
     #print(utemp)
+    utemp = utemp/10
   
     
     # calculate the seasonal suitability for average seasonal temperature for n crops
@@ -546,5 +542,5 @@ f <- function (ngrid, ncrop) {
 
 }
 
-f(ngrid = 3390, ncrop = 1842)
-#f(ngrid = 15, ncrop = 10)
+#f(ngrid = 3390, ncrop = 1842)
+f(ngrid = 15, ncrop = 10)

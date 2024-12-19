@@ -20,11 +20,10 @@ claydata = mask(crop(claydata,extent(slkbnd)), slkbnd)
 depthdata = mask(crop(depthdata,extent(slkbnd)), slkbnd)
 
 outpath = "/Users/ej/CFFRC/04-Research/UC metrics/UCMetrics-SLK/in/soilgrids/"
-for (i in c(1:7)){
-  writeRaster(phdata[[i]], paste0(outpath, names(phdata[[i]]),"_slk"), format = "GTiff",overwrite=TRUE)
-  writeRaster(sandata[[i]], paste0(outpath, names(phdata[[i]]),"_slk"), format = "GTiff",overwrite=TRUE)
-  writeRaster(claydata[[i]], paste0(outpath, names(phdata[[i]]),"_slk"), format = "GTiff",overwrite=TRUE)
-  
+for (i in 1:7){
+  writeRaster(phdata[[i]], paste0(outpath, names(phdata)[i],"_slk"), format = "GTiff",overwrite=TRUE)
+  writeRaster(sandata[[i]], paste0(outpath, names(sandata)[i],"_slk"), format = "GTiff",overwrite=TRUE)
+  writeRaster(claydata[[i]], paste0(outpath, names(claydata)[i],"_slk"), format = "GTiff",overwrite=TRUE)
 }
 writeRaster(depthdata, paste0(outpath, names(depthdata),"_slk"), format = "GTiff",overwrite=TRUE)
   
